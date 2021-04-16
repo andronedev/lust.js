@@ -1,0 +1,16 @@
+{
+  "name": "lustapi",
+  "version": "1.0.0",
+  "description": "https://net-lust.com/ API nodejs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "andronedev",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "node-html-parser": "^3.1.5",
+    "tough-cookie": "^4.0.0"
+  }
+}
