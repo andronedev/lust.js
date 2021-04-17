@@ -1,6 +1,6 @@
 {
   "name": "lust.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "https://net-lust.com/ API nodejs",
   "repository": "https://github.com/andronedev/lust.js",
   "main": "index.js",

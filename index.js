@@ -54,7 +54,7 @@ class Lust {
   }
   /**
    * Récupérer des informations d'un profil
-   * Pas besoin d'être connecté
+   * (pas besoin d'être connecté)
    * @summary obtenir le profil d'un utilisateur ou de l'utilisateur connecté
    * @param {string} [username="nom d'utilisateur si connecté"] 
    * @return {json}
