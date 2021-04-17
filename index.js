@@ -1,23 +1,30 @@
+require("./update");
 var axios = require("axios");
 var qs = require("qs");
 var HTMLParser = require("node-html-parser");
+
 const BASE_URL = "https://net-lust.com/";
 
-/** 
- * @module Lust 
-*/
+/**
+ * @module Lust
+ */
 class Lust {
-  cookies = [];
-
   constructor(mail, pass) {
     this.mail = mail;
     this.pass = pass;
+    Lust.cookies = [];
   }
+
   /**
-   * Login to lust account
-   * @param {string} email - The mail of the account
-   * @param {string} password - The password of the account
+   * Connexion au compte Lust
+   * @param {string} email - Le mail du compte
+   * @param {string} password - Le mot de passe du compte
    * @return {promise}
+   * @example
+   * var app = new Lust("xxx@xxxx.xx","xxx")
+   * app.login().then(()=>{
+   *  app.getHome().then(posts=>console.log(posts.postsFollow))
+   * })
    */
   login() {
     return new Promise((resolve, reject) => {
@@ -41,18 +48,42 @@ class Lust {
           resolve();
         })
         .catch(function (error) {
-          reject(error);
+          reject(error.code);
         });
     });
   }
   /**
-   * Retrieve information from a profile
-   * @summary get the profil of a user or the logged user
-   * @param {string} username - default : current logged user
+   * Récupérer des informations d'un profil
+   * Pas besoin d'être connecté
+   * @summary obtenir le profil d'un utilisateur ou de l'utilisateur connecté
+   * @param {string} [username="nom d'utilisateur si connecté"] 
    * @return {json}
+   * @example
+   * app.getProfil("andronedev").then(console.log)
+   * // return :
+   *   {
+   *     username: 'andronedev',
+   *     imgProfil: 'https://net-lust.com/assets/users/profils/1115514632.gif',
+   *     followersCount: '1',
+   *     memberSince: '20 Feb 2021',
+   *     posts: [
+   *       {
+   *         id: '341',
+   *         username: 'andronedev',
+   *         profilLink: 'https://net-lust.com/profil?pseudo=andronedev',
+   *         date: 'il y a 11 jours',
+   *         message: 'Salut',
+   *         img: null
+   *       },
+   *      [...]
+   *     ]
+   *   }
    */
   getProfil(username = "") {
     return new Promise((resolve, reject) => {
+      if (!username && !Lust.cookie)
+        reject("Merci de vous connecter ou de specifier un utilisateur");
+
       var config = {
         method: "get",
         url: BASE_URL + "profil" + "?pseudo=" + username,
@@ -63,6 +94,11 @@ class Lust {
 
       axios(config)
         .then(function (response) {
+          if (
+            response.data == "L'utilisateur que vous cherchez est introuvable."
+          ) {
+            reject("Utilisateur introuvable.");
+          }
           var root = HTMLParser.parse(response.data);
 
           resolve({
@@ -100,15 +136,29 @@ class Lust {
           });
         })
         .catch(function (error) {
-          console.log(error);
-          reject(error);
+          reject(error.code);
         });
     });
   }
   /**
-   * Retrieve information from the home feed
-   * @summary get the home feed (posts)
-   * @return {json} Home feed
+   * Récupérer des informations à partir de la page home.
+   * @summary obtenir le flux d'accueil (posts)
+   * @return {json} flux d'accueil (posts)
+   * @example
+   * app.getHome().then(posts=>console.log(posts))
+   * // return : 
+   *  {
+   *    postsFollow: [
+   *      {
+   *        id: '444',
+   *        username: 'Zartov',
+   *        profilLink: 'https://net-lust.com/profil?pseudo=Zartov',
+   *        date: 'il y a 4 jours',
+   *        message: 'pas mal #FlightSimulator 😅',
+   *        img: 'https://i.imgur.com/tMT4Blv.jpg'
+   *      },
+   *     [...]
+   *  {
    */
   getHome() {
     return new Promise((resolve, reject) => {
@@ -148,16 +198,27 @@ class Lust {
           });
         })
         .catch(function (error) {
-          console.log(error);
-          reject(error);
+          reject(error.code);
         });
     });
   }
 
   /**
-   * Retrieve comments from a post
-   * @param {string} id - the post id
+   * Récupérer les commentaires d'un post
+   * @param {string} id - l'id du poste
    * @return {json}
+   * @example
+   * app.getComments("444").then(console.log)
+   * // return :
+   * [
+   *  {
+   *    username: 'andronedev',
+   *    profilLink: 'https://net-lust.com/profil?pseudo=Zartov',
+   *    date: 'il y a 21 jours',
+   *    message: 'Salut !'
+   *  },
+   * [...]
+   * ]
    */
   getComments(id) {
     return new Promise((resolve, reject) => {
@@ -187,11 +248,10 @@ class Lust {
           );
         })
         .catch(function (error) {
-          console.log(error);
-          reject(error);
+          reject(error.code);
         });
     });
   }
-};
+}
 
 module.exports = Lust;
