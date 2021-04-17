@@ -1,16 +1,16 @@
 {
-  "name": "lustapi",
-  "version": "1.0.0",
+  "name": "lust.js",
+  "version": "0.0.1",
   "description": "https://net-lust.com/ API nodejs",
-  "main": "app.js",
+  "repository": "https://github.com/andronedev/lust.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js"
   },
   "author": "andronedev",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.1",
-    "node-html-parser": "^3.1.5",
-    "tough-cookie": "^4.0.0"
+    "node-html-parser": "^3.1.5"
   }
 }

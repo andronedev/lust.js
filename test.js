@@ -1,7 +1,7 @@
-const Lust = require('./app');
+const Lust = require('.');
 
-var app = new Lust("andronedev@gmail.com","JL4D6pn5c")
+var app = new Lust("xxx@xxxx.xx","xxx")
 
 app.login().then(()=>{
-    app.getHome().then(console.log)
+ app.getProfil("andronedev").then(console.log)
 })
