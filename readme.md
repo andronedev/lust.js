@@ -1,6 +1,5 @@
 # Lust.js (Bêta)
 ## A nodejs client for the site https://net-lust.com/
-by AndroneDev
 
 <hr/>
 
