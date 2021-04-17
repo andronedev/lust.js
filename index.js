@@ -56,7 +56,7 @@ class Lust {
    * Récupérer des informations d'un profil
    * (pas besoin d'être connecté)
    * @summary obtenir le profil d'un utilisateur ou de l'utilisateur connecté
-   * @param {string} [username="nom d'utilisateur si connecté"] 
+   * @param {string} [username="nom d'utilisateur si connecté"]
    * @return {json}
    * @example
    * app.getProfil("andronedev").then(console.log)
@@ -146,7 +146,7 @@ class Lust {
    * @return {json} flux d'accueil (posts)
    * @example
    * app.getHome().then(posts=>console.log(posts))
-   * // return : 
+   * // return :
    *  {
    *    postsFollow: [
    *      {
@@ -244,6 +244,68 @@ class Lust {
                 date: el.querySelector(".post-user-span-date").text,
                 message: el.querySelector(".post-user-message-span").text,
               };
+            })
+          );
+        })
+        .catch(function (error) {
+          reject(error.code);
+        });
+    });
+  }
+
+  /**
+   * Récupérer le resultat d'une recherche
+   * @param {string} query - champ de recherche
+   * @return {json}
+   * @example
+   * app.search("zar").then(console.log)
+   * // return :
+   *   [
+   *     { type: 'hashtag', hashtag: '#ZartovElypse' },
+   *     {
+   *       type: 'account',
+   *       username: 'Zartov',
+   *       profilLink: 'profil?pseudo=Zartov',
+   *       imgProfil: 'assets/users/profils/1115514560.jpg'
+   *     },
+   *    [...]
+   *   ]
+   */
+  search(query) {
+    return new Promise((resolve, reject) => {
+      var data = "query="+query;
+
+      var config = {
+        method: "post",
+        url: BASE_URL + "inserts/insert.search.php",
+        headers: {
+          Cookie: Lust.cookies,
+        },
+        data: data,
+      };
+
+      axios(config)
+        .then(function (response) {
+          var root = HTMLParser.parse(response.data);
+          var listes = root.querySelectorAll("#list-search");
+          resolve(
+            listes.map(el => {
+              let type = !el.querySelector(".result-content-search")
+                ? "account"
+                : "hashtag";
+              if (type == "hashtag") {
+                return {
+                  type: type,
+                  hashtag : el.querySelector(".result-content-search").text
+                };
+              }else{
+                return {
+                  type: type,
+                  username: el.querySelector("a").text,
+                  profilLink: el.querySelector("a").getAttribute("href"),
+                  imgProfil: el.querySelector("img").getAttribute("src"),
+                }
+              }
             })
           );
         })
