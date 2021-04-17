@@ -15,6 +15,14 @@ class Lust {
     Lust.cookies = [];
   }
 
+  getCookies() {
+    var cookietext = ""
+    Lust.cookies.map(c=>{
+      cookietext +=c.split(";")[0] + "; "
+    })
+    return cookietext
+  }
+
   /**
    * Connexion au compte Lust
    * @param {string} email - Le mail du compte
@@ -48,10 +56,11 @@ class Lust {
           resolve();
         })
         .catch(function (error) {
-          reject(error.code);
+          reject(error);
         });
     });
   }
+
   /**
    * Permet de récupérer les informations d'un profil
    * (pas besoin d'être connecté)
@@ -136,7 +145,7 @@ class Lust {
           });
         })
         .catch(function (error) {
-          reject(error.code);
+          reject(error);
         });
     });
   }
@@ -198,7 +207,7 @@ class Lust {
           });
         })
         .catch(function (error) {
-          reject(error.code);
+          reject(error);
         });
     });
   }
@@ -248,7 +257,7 @@ class Lust {
           );
         })
         .catch(function (error) {
-          reject(error.code);
+          reject(error);
         });
     });
   }
@@ -273,7 +282,7 @@ class Lust {
    */
   search(query) {
     return new Promise((resolve, reject) => {
-      var data = "query="+query;
+      var data = "query=" + query;
 
       var config = {
         method: "post",
@@ -289,28 +298,80 @@ class Lust {
           var root = HTMLParser.parse(response.data);
           var listes = root.querySelectorAll("#list-search");
           resolve(
-            listes.map(el => {
+            listes.map((el) => {
               let type = !el.querySelector(".result-content-search")
                 ? "account"
                 : "hashtag";
               if (type == "hashtag") {
                 return {
                   type: type,
-                  hashtag : el.querySelector(".result-content-search").text
+                  hashtag: el.querySelector(".result-content-search").text,
                 };
-              }else{
+              } else {
                 return {
                   type: type,
                   username: el.querySelector("a").text,
                   profilLink: el.querySelector("a").getAttribute("href"),
                   imgProfil: el.querySelector("img").getAttribute("src"),
-                }
+                };
               }
             })
           );
         })
         .catch(function (error) {
-          reject(error.code);
+          reject(error);
+        });
+    });
+  }
+
+  /**
+   * Permet d'Ajouter un post
+   * @param {string} message
+   * @param {string} image - lien de l'image (ex : https://i.imgur.com/zabyPE5.jpg)
+   * @return {json}
+   * @example
+   * app.addPost("zar").then(console.log)
+   * // return :
+   *   [
+   *     { type: 'hashtag', hashtag: '#ZartovElypse' },
+   *     {
+   *       type: 'account',
+   *       username: 'Zartov',
+   *       profilLink: 'profil?pseudo=Zartov',
+   *       imgProfil: 'assets/users/profils/1115514560.jpg'
+   *     },
+   *    [...]
+   *   ]
+   */
+  addPost(message, img) {
+    return new Promise((resolve, reject) => {
+      console.log(this.getCookies());
+      var data =
+        "publication=" + encodeURI(message) + "&image=" + encodeURI(img || "");
+      var config = {
+        method: "post",
+        url: BASE_URL + "inserts/insert.post.php",
+        headers: {
+         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+
+          cookie: this.getCookies(),
+        },
+        data: data,
+      };
+
+      axios(config)
+        .then(function (response) {
+          if (!response.data) reject("Une erreur est survenue");
+          var root = HTMLParser.parse(response.data);
+          resolve({
+            id: root
+              .querySelector("#post_container > .post-container-together")
+              .getAttribute("id")
+              .replace("-numberPost", ""),
+          });
+        })
+        .catch(function (error) {
+          reject(error);
         });
     });
   }
