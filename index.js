@@ -53,7 +53,7 @@ class Lust {
     });
   }
   /**
-   * Récupérer des informations d'un profil
+   * Permet de récupérer les informations d'un profil
    * (pas besoin d'être connecté)
    * @summary obtenir le profil d'un utilisateur ou de l'utilisateur connecté
    * @param {string} [username="nom d'utilisateur si connecté"]
@@ -141,7 +141,7 @@ class Lust {
     });
   }
   /**
-   * Récupérer des informations à partir de la page home.
+   * Permet de récupérer des informations à partir de la page home.
    * @summary obtenir le flux d'accueil (posts)
    * @return {json} flux d'accueil (posts)
    * @example
@@ -204,7 +204,7 @@ class Lust {
   }
 
   /**
-   * Récupérer les commentaires d'un post
+   * Permet de récupérer les commentaires d'un post
    * @param {string} id - l'id du poste
    * @return {json}
    * @example
@@ -254,7 +254,7 @@ class Lust {
   }
 
   /**
-   * Récupérer le resultat d'une recherche
+   * Permet de récupérer le resultat d'une recherche
    * @param {string} query - champ de recherche
    * @return {json}
    * @example
