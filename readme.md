@@ -1,7 +1,7 @@
 # Lust.js (Bêta)
 
 ## Un client javascript pour le site <https://net-lust.com/>
-
+[Démo](https://replit.com/@andronedev/lustjs-demo)
 <hr/>
 
 `npm i lust.js`
