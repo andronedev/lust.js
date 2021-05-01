@@ -31,12 +31,21 @@ app.login()
         -   [Examples](#examples-1)
     -   [getHome](#gethome)
         -   [Examples](#examples-2)
-    -   [getComments](#getcomments)
+    -   [onMessage](#onmessage)
         -   [Parameters](#parameters-2)
         -   [Examples](#examples-3)
-    -   [search](#search)
+    -   [addPost](#addpost)
         -   [Parameters](#parameters-3)
         -   [Examples](#examples-4)
+    -   [addComment](#addcomment)
+        -   [Parameters](#parameters-4)
+        -   [Examples](#examples-5)
+    -   [getComments](#getcomments)
+        -   [Parameters](#parameters-5)
+        -   [Examples](#examples-6)
+    -   [search](#search)
+        -   [Parameters](#parameters-6)
+        -   [Examples](#examples-7)
 
 ## Lust
 
@@ -93,7 +102,7 @@ app.getProfil("andronedev").then(console.log)
   }
 ```
 
-Returns **[json](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON)** 
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;ProfilType>** 
 
 ### getHome
 
@@ -118,7 +127,60 @@ app.getHome().then(posts=>console.log(posts))
  {
 ```
 
-Returns **[json](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON)** flux d'accueil (posts)
+### onMessage
+
+Permet de faire une action quand un nouveau message est reçu
+
+#### Parameters
+
+-   `callback`  
+
+#### Examples
+
+```javascript
+app.onMessage(msg => {
+console.log("Nouveau message :\n", msg.username, " : ", msg.message)
+})
+```
+
+Returns **this** 
+
+### addPost
+
+Permet d'Ajouter un post
+
+#### Parameters
+
+-   `message` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `img`   (optional, default `""`)
+-   `image` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** lien de l'image (ex : <https://i.imgur.com/zabyPE5.jpg>)
+
+#### Examples
+
+```javascript
+app.addPost("salut à tous", "https://i.imgur.com/zabyPE5.jpg").then((p) => {
+console.log("id du poste : ", p.id);
+})
+```
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;{id: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), url: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}>** 
+
+### addComment
+
+Permet d'Ajouter un commentaire
+
+#### Parameters
+
+-   `id` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** l'id du post
+-   `message` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+
+#### Examples
+
+```javascript
+app.addComment("Commentaire")
+```
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;{void}>** 
 
 ### getComments
 
@@ -144,7 +206,7 @@ app.getComments("444").then(console.log)
 ]
 ```
 
-Returns **[json](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON)** 
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;CommentsType>** 
 
 ### search
 
@@ -171,4 +233,4 @@ app.search("zar").then(console.log)
   ]
 ```
 
-Returns **[json](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON)** 
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;searchType>** 
