@@ -1,10 +1,39 @@
-require("./update");
-var axios = require("axios");
+var axios = require("axios").default;
 var qs = require("qs");
 var HTMLParser = require("node-html-parser");
 
 const BASE_URL = "https://net-lust.com/";
 
+const CommentsType = {
+  username: "",
+  profilLink: "",
+  message: "",
+  date: "",
+};
+const PostsType = {
+  id: "",
+  username: "",
+  profilLink: "",
+  date: "",
+  message: "",
+  img: "",
+};
+
+const ProfilType = {
+  username: "",
+  imgProfil: "",
+  followersCount: 0,
+  memberSince: "",
+  posts: [PostsType],
+};
+
+const searchType = {
+  username: "",
+  imgProfil: "",
+  profilLink: "",
+  type: "",
+  hashtag: "",
+};
 /**
  * @module Lust
  */
@@ -13,6 +42,14 @@ class Lust {
     this.mail = mail;
     this.pass = pass;
     Lust.cookies = [];
+  }
+
+  getCookies() {
+    var cookietext = "";
+    Lust.cookies.map((c) => {
+      cookietext += c.split(";")[0] + "; ";
+    });
+    return cookietext;
   }
 
   /**
@@ -45,19 +82,33 @@ class Lust {
       axios(config)
         .then(function (response) {
           Lust.cookies = response.headers["set-cookie"];
-          resolve();
+          //validate session
+          axios({
+            method: "get",
+            url: BASE_URL + "home",
+            headers: {
+              cookie: Lust.cookies,
+            },
+          })
+            .then((resp) => {
+              resolve();
+            })
+            .catch(function (error) {
+              reject(error.code);
+            });
         })
         .catch(function (error) {
           reject(error.code);
         });
     });
   }
+
   /**
    * Permet de récupérer les informations d'un profil
    * (pas besoin d'être connecté)
    * @summary obtenir le profil d'un utilisateur ou de l'utilisateur connecté
    * @param {string} [username="nom d'utilisateur si connecté"]
-   * @return {json}
+   * @return {Promise<ProfilType>}
    * @example
    * app.getProfil("andronedev").then(console.log)
    * // return :
@@ -81,7 +132,7 @@ class Lust {
    */
   getProfil(username = "") {
     return new Promise((resolve, reject) => {
-      if (!username && !Lust.cookie)
+      if (!username && !Lust.cookies)
         reject("Merci de vous connecter ou de specifier un utilisateur");
 
       var config = {
@@ -143,7 +194,7 @@ class Lust {
   /**
    * Permet de récupérer des informations à partir de la page home.
    * @summary obtenir le flux d'accueil (posts)
-   * @return {json} flux d'accueil (posts)
+   * @return {Promise<{postsFollow:[PostsType]}} flux d'accueil (posts)
    * @example
    * app.getHome().then(posts=>console.log(posts))
    * // return :
@@ -204,9 +255,115 @@ class Lust {
   }
 
   /**
+   * Permet de faire une action quand un nouveau message est reçu
+   * @param {(msg: PostsType) => void} callback
+   * @return {this}
+   * @example
+   * app.onMessage(msg => {
+   * console.log("Nouveau message :\n", msg.username, " : ", msg.message)
+   * })
+   */
+  onMessage(callback) {
+    let currentId;
+
+    setInterval(() => {
+      this.getHome().then((posts) => {
+        if (
+          !(currentId === posts.postsFollow[0].id) &&
+          currentId < posts.postsFollow[0].id
+        ) {
+          callback(posts.postsFollow[0]);
+        }
+        currentId = posts.postsFollow[0].id;
+      });
+    }, 1000);
+  }
+  /**
+   * Permet d'Ajouter un post
+   * @param {string} message
+   * @param {string} image - lien de l'image (ex : https://i.imgur.com/zabyPE5.jpg)
+   * @return {Promise<{id:string,url:string}>}
+   * @example
+   * app.addPost("salut à tous", "https://i.imgur.com/zabyPE5.jpg").then((p) => {
+   * console.log("id du poste : ", p.id);
+   * })
+   */
+  addPost(message, img = "") {
+    return new Promise((resolve, reject) => {
+      console.log(Lust.cookies);
+      var data = qs.stringify({
+        publication: encodeURI(message),
+        image: encodeURI(img),
+      });
+      var config = {
+        method: "post",
+        url: BASE_URL + "inserts/insert.post.php",
+        headers: {
+          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+
+          cookie: Lust.cookies,
+        },
+        data: data,
+      };
+
+      axios(config)
+        .then(function (response) {
+          if (!response.data) reject("Une erreur est survenue");
+          var root = HTMLParser.parse(response.data);
+          var postID = root
+            .querySelector("#post_container > .post-container-together")
+            .getAttribute("id")
+            .replace("-numberPost", "");
+          resolve({
+            id: postID,
+            url: BASE_URL + "share?id=" + postID,
+          });
+        })
+        .catch(function (error) {
+          reject(error);
+        });
+    });
+  }
+  /**
+   * Permet d'Ajouter un commentaire
+   * @param {string} message
+   * @param {string} id - l'id du post
+   * @return {Promise<{void}>}
+   * @example
+   * app.addComment("Commentaire")
+   */
+  addComment(id, message) {
+    return new Promise((resolve, reject) => {
+      console.log(Lust.cookies);
+      var data = qs.stringify({
+        textarea_comment: encodeURI(message),
+      });
+      var config = {
+        method: "post",
+        url: BASE_URL + "comment.php?id=" + id,
+        headers: {
+          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+
+          cookie: Lust.cookies,
+        },
+        data: data,
+      };
+
+      axios(config)
+        .then(function (response) {
+          if (!response.data) reject("Une erreur est survenue");
+
+          resolve(true);
+        })
+        .catch(function (error) {
+          reject(error);
+        });
+    });
+  }
+  /**
    * Permet de récupérer les commentaires d'un post
    * @param {string} id - l'id du poste
-   * @return {json}
+   * @return {Promise<CommentsType>}
    * @example
    * app.getComments("444").then(console.log)
    * // return :
@@ -256,7 +413,7 @@ class Lust {
   /**
    * Permet de récupérer le resultat d'une recherche
    * @param {string} query - champ de recherche
-   * @return {json}
+   * @return {Promise<searchType>}
    * @example
    * app.search("zar").then(console.log)
    * // return :
@@ -273,7 +430,7 @@ class Lust {
    */
   search(query) {
     return new Promise((resolve, reject) => {
-      var data = "query="+query;
+      var data = "query=" + query;
 
       var config = {
         method: "post",
@@ -289,22 +446,22 @@ class Lust {
           var root = HTMLParser.parse(response.data);
           var listes = root.querySelectorAll("#list-search");
           resolve(
-            listes.map(el => {
+            listes.map((el) => {
               let type = !el.querySelector(".result-content-search")
                 ? "account"
                 : "hashtag";
               if (type == "hashtag") {
                 return {
                   type: type,
-                  hashtag : el.querySelector(".result-content-search").text
+                  hashtag: el.querySelector(".result-content-search").text,
                 };
-              }else{
+              } else {
                 return {
                   type: type,
                   username: el.querySelector("a").text,
                   profilLink: el.querySelector("a").getAttribute("href"),
                   imgProfil: el.querySelector("img").getAttribute("src"),
-                }
+                };
               }
             })
           );
