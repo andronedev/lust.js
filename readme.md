@@ -6,6 +6,8 @@
 
 `npm i lust.js`
 
+# Nodejs
+
 ```js
 const Lust = require('lust.js');
 
@@ -14,6 +16,23 @@ var app = new Lust("xxx@xxx.xx","xxxxxxxxx")
 app.login()
 
 // [...]
+```
+
+* * *
+
+## Broswer version / etc :
+
+CDN : <https://unpkg.com/lust.js@latest/browser.min.js>
+
+```html
+<script src="https://unpkg.com/lust.js@latest/browser.min.js"></script>
+<script>
+    var Lust = require("Lust")
+    var app = new Lust("xxx@xxx.xx","xxx")
+    app.login().then(()=>{
+    app.getProfil("andronedev").then(profil=>console.log(profil.username + " a " + profil.followersCount + " abonnés"))
+    })
+</script>
 ```
 
 # docs
@@ -48,6 +67,10 @@ app.login()
         -   [Examples](#examples-7)
 
 ## Lust
+
+**Meta**
+
+-   **author**: Nicolas (AndroneDev) - 2021
 
 ### login
 

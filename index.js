@@ -36,6 +36,7 @@ const searchType = {
 };
 /**
  * @module Lust
+ * @author Nicolas (AndroneDev) - 2021
  */
 class Lust {
   constructor(mail, pass) {
