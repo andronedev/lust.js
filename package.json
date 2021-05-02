@@ -1,11 +1,13 @@
 {
   "name": "lust.js",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "description": "https://net-lust.com/ API nodejs",
   "repository": "https://github.com/andronedev/lust.js",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "build-browser": "browserify -r ./index.js:Lust > browser.js && uglifyjs --compress --no-annotations -o browser.min.js -- browser.js",
+    "build-docs": "documentation readme index.js -s docs"
   },
   "author": "andronedev",
   "license": "Apache-2.0 License",
