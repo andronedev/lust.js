@@ -292,8 +292,8 @@ class Lust {
   addPost(message, img = "") {
     return new Promise((resolve, reject) => {
       var data = qs.stringify({
-        publication: encodeURI(message),
-        image: encodeURI(img),
+        publication: message,
+        image: img,
       });
       var config = {
         method: "post",
@@ -335,7 +335,7 @@ class Lust {
   addComment(id, message) {
     return new Promise((resolve, reject) => {
       var data = qs.stringify({
-        textarea_comment: encodeURI(message),
+        textarea_comment: message,
       });
       var config = {
         method: "post",
