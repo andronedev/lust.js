@@ -39,10 +39,10 @@ const searchType = {
  * @author Nicolas (AndroneDev) - 2021
  */
 class Lust {
-  constructor(mail, pass) {
+  constructor(mail, pass, cookies = []) {
     this.mail = mail;
     this.pass = pass;
-    Lust.cookies = [];
+    Lust.cookies = cookies || [];
   }
 
   getCookies() {
@@ -291,7 +291,6 @@ class Lust {
    */
   addPost(message, img = "") {
     return new Promise((resolve, reject) => {
-      console.log(Lust.cookies);
       var data = qs.stringify({
         publication: encodeURI(message),
         image: encodeURI(img),
@@ -335,7 +334,6 @@ class Lust {
    */
   addComment(id, message) {
     return new Promise((resolve, reject) => {
-      console.log(Lust.cookies);
       var data = qs.stringify({
         textarea_comment: encodeURI(message),
       });

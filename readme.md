@@ -20,7 +20,9 @@ app.login()
 
 * * *
 
-## Broswer version / etc :
+## Browser version / etc :
+
+PATH : `lust.js/browser.min.js`
 
 CDN : <https://unpkg.com/lust.js@latest/browser.min.js>
 
